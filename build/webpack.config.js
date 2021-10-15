@@ -4,29 +4,30 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const vueLoaderPlugin = require('vue-loader/lib/plugin')
 const Webpack = require('webpack')
+const devMode = process.argv.indexOf('--mode=production') === -1;
 module.exports = {
-  mode: 'development', // 开发模式
   entry: ['@babel/polyfill', path.resolve(__dirname, '../src/main.js')],    // 入口文件
   output: {
+    // publicPath: '.',
     filename: './js/[name].[hash:8].js',      // 打包后的文件名称
-    path: path.resolve(__dirname, '../dist')  // 打包后的目录
+    path: path.resolve(__dirname, '../dist'),  // 打包后的目录
+    chunkFilename: './js/[name].[hash:8].js'
   },
-  devServer: {
-    port: 3000,
-    hot: true,
-    contentBase: '../dist'
-  },
+
   plugins: [
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../public/index.html')
     }),
     new CleanWebpackPlugin({}),
+    // new MiniCssExtractPlugin({
+    //   filename: "./css/[name].[hash].css",
+    //   chunkFilename: "[id].css",
+    // }),
     new MiniCssExtractPlugin({
-      filename: "./css/[name].[hash].css",
-      chunkFilename: "[id].css",
+      filename: devMode ? './css/[name].css' : './css/[name].[hash].css',
+      chunkFilename: devMode ? '[id].css' : '[id].[hash].css'
     }),
     new vueLoaderPlugin(),
-    new Webpack.HotModuleReplacementPlugin()
   ],
   module: {
     rules: [
